@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+  <title>Join Chat Room</title>
+  <style>
+    /* Custom CSS for form styling */
+    body {
+      padding: 20px;
+    }
+
+    .form-container {
+      max-width: 400px;
+      margin: auto;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-container label {
+      font-weight: bold;
+    }
+
+    .form-container button {
+      width: 100%;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="form-container">
+      <h2>Join Chat Room</h2>
+      <form id="room-selection-form">
+        <label for="username-input">Username:</label>
+        <input type="text" id="username-input" required>
+        <label for="room-select">Choose a Room:</label>
+        <select id="room-select" required>
+          <option value="1">Room1</option>
+          <option value="2">Room2</option>
+          <option value="3">Room3</option>
+        </select>
+        <button type="submit" onclick="joinRoom()">Join Room</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    const socket = io();
+
+    document.getElementById('room-selection-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const username = document.getElementById('username-input').value;
+      const room = document.getElementById('room-select').value;
+      socket.emit('join_room', { username, room });
+      socket.on('error_message', (data) => {
+        alert(data.message);
+      });
+
+      socket.on('receive_message', (data) => {
+        if (data.username === 'ChatBot' && data.message.includes(`Welcome ${username}`)) {
+          window.location.href = `/newchat?username=${username}&room=${room}`;
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
